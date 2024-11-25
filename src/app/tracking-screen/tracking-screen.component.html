@@ -1,0 +1,32 @@
+<div class="tracking-header">
+  <h2>MPO Process Overview</h2>
+  <p>Details about the processes are displayed below.</p>
+</div>
+
+<div *ngIf="data?.MPO" class="tracking-container">
+  <!-- Header Section -->
+  <div
+    class="process-column"
+    *ngFor="let process of data.MPO.Process; let i = index"
+    cdkDropList
+    [cdkDropListData]="getBodyItems(process)"
+    [cdkDropListConnectedTo]="[i < data.MPO.Process.length - 1 ? 'list-' + (i + 1) : '']"
+    [id]="'list-' + i"
+    (cdkDropListDropped)="onDrop($event, i)"
+  >
+    <h3>{{ process.Title }}</h3>
+    <div class="card" *ngFor="let item of getBodyItems(process)" cdkDrag>
+      <div class="card-content">
+        <div>Name: {{ item.Name }}</div>
+        <div>Input: {{ item.Input }}</div>
+        <div>API: {{ item.API }}</div>
+        <div>Value: {{ item.Value }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Footer Section -->
+  <div class="tracking-footer">
+    <p>&copy; 2024 MPO Tracking. All rights reserved.</p>
+    <button>Footer Action</button>
+  </div>
