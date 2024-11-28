@@ -9,13 +9,15 @@
     class="process-column"
     *ngFor="let process of data.MPO.Process; let i = index"
     cdkDropList
-    [cdkDropListData]="getBodyItems(process)"
+    [cdkDropListData]="process.Items"
     [cdkDropListConnectedTo]="[i < data.MPO.Process.length - 1 ? 'list-' + (i + 1) : '']"
     [id]="'list-' + i"
     (cdkDropListDropped)="onDrop($event, i)"
   >
     <h3>{{ process.Title }}</h3>
-    <div class="card" *ngFor="let item of getBodyItems(process)" cdkDrag>
+    <span>MPO Quantity: {{ process.Items.length }}</span>
+
+    <div class="card" *ngFor="let item of process.Items" cdkDrag   (click)="openModal(item)">
       <div class="card-content">
         <div>Name: {{ item.Name }}</div>
         <div>Input: {{ item.Input }}</div>
@@ -25,8 +27,9 @@
     </div>
   </div>
 </div>
-  <!-- Footer Section -->
-  <div class="tracking-footer">
-    <p>&copy; 2024 MPO Tracking. All rights reserved.</p>
-    <button>Footer Action</button>
-  </div>
+
+<!-- Footer Section -->
+<div class="tracking-footer">
+  <p>&copy; 2024 MPO Tracking. All rights reserved.</p>
+  <button>Footer Action</button>
+</div>
