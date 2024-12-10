@@ -3,26 +3,23 @@
   <p>Details about the processes are displayed below.</p>
 </div>
 
-<div *ngIf="data?.MPO" class="tracking-container">
+<div *ngIf="data?.length" class="tracking-container">
   <!-- Header Section -->
-  <div
-    class="process-column"
-    *ngFor="let process of data.MPO.Process; let i = index"
-    cdkDropList
-    [cdkDropListData]="process.Items"
-    [cdkDropListConnectedTo]="[i < data.MPO.Process.length - 1 ? 'list-' + (i + 1) : '']"
-    [id]="'list-' + i"
-    (cdkDropListDropped)="onDrop($event, i)"
-  >
-    <h3>{{ process.Title }}</h3>
-    <span>MPO Quantity: {{ process.Items.length }}</span>
+  <div class="process-column" *ngFor="let process of trackerHeader | orderBy: 'sequence'" 
+       cdkDropList
+       [cdkDropListData]="getItemsByStatus(process.key)"
+       [cdkDropListConnectedTo]="getConnectedList(process.sequence)"
+       [id]="'list-' + process.sequence"
+       (cdkDropListDropped)="onDrop($event, process)">
+    <h3>{{ process.processName }}</h3>
+    <span>MPO Quantity: {{ getItemsByStatus(process.key).length }}</span>
 
-    <div class="card" *ngFor="let item of process.Items" cdkDrag   (click)="openModal(item)">
+    <div class="card" *ngFor="let item of getItemsByStatus(process.key)" cdkDrag (click)="openModal(item)">
       <div class="card-content">
-        <div>Name: {{ item.Name }}</div>
-        <div>Input: {{ item.Input }}</div>
-        <div>API: {{ item.API }}</div>
-        <div>Value: {{ item.Value }}</div>
+        <div>Vendor: {{ item.vendor }}</div>
+        <div>MPO Date: {{ item.mpoDate }}</div>
+        <div>MPO Amount: {{ item.mpoAmount }}</div>
+        <!-- <div>S: {{ item.status }}</div> -->
       </div>
     </div>
   </div>

@@ -12,12 +12,13 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 import { ModalContentComponent } from './modal-content/modal-content.component';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-
+import { OrderByPipe } from './pipe/order-by.pipe';
 @NgModule({
   declarations: [
     AppComponent,
     TrackingScreenComponent,
-    ModalContentComponent
+    ModalContentComponent,
+    OrderByPipe
   ],
   imports: [
     MatDialogModule,
@@ -29,7 +30,7 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     // Use compat module to initialize Firebase
     AngularFireAuthModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
