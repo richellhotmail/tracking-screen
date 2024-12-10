@@ -11,6 +11,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 import { ModalContentComponent } from './modal-content/modal-content.component';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 @NgModule({
   declarations: [
@@ -25,10 +26,16 @@ import { ModalContentComponent } from './modal-content/modal-content.component';
     AppRoutingModule,
     DragDropModule,
     BrowserAnimationsModule,
-    // AngularFireModule.initializeApp(environment.firebase),
+    // Use compat module to initialize Firebase
+    AngularFireAuthModule,
+    AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+    // Initialization logic can go here if needed.
+  }
+}
