@@ -1,0 +1,99 @@
+/* General Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #4b6cb7, #182848); /* Futuristic gradient background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.login-box {
+  background-color: rgba(255, 255, 255, 0.1); /* Transparent white background */
+  border-radius: 15px;
+  padding: 30px;
+  width: 300px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  // backdrop-filter: blur(10px); /* Blur effect for the background */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Add animation on hover for the login box */
+.login-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+  color: #ffffff;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Input Group */
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: black; /* Change text color to black */
+  font-size: 1rem;
+  outline: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Input field focus effect */
+input:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: #4b6cb7;
+}
+
+/* Button Styles */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4b6cb7, #182848);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Button hover effect */
+.login-btn:hover {
+  background: linear-gradient(135deg, #182848, #4b6cb7);
+  transform: translateY(-3px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .login-box {
+    width: 85%;
+    padding: 20px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+}

@@ -121,3 +121,12 @@ h3 {
   padding: 5px 10px;
   font-size: 14px;
 }
+.tracking-screen {
+  margin-top: 20px;  /* Space between header and tracking screen */
+  padding: 20px;
+  background-color: #ffffff;  /* White background for the tracking section */
+  border: 1px solid #ddd;  /* Border around the tracking section */
+  overflow-x: auto;  /* Enables horizontal scrolling */
+  white-space: nowrap;  /* Prevents wrapping of the content */
+  max-width: 100%;  /* Ensures content fits within the screen's width */
+}

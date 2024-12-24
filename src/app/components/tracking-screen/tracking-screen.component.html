@@ -4,7 +4,7 @@
 </div>
 
 <div *ngIf="data?.length" class="tracking-container">
-  <!-- Header Section -->
+  <!-- Header Section -->      
   <div class="process-column" *ngFor="let process of trackerHeader | orderBy: 'sequence'" 
        cdkDropList
        [cdkDropListData]="getItemsByStatus(process.key)"
@@ -16,10 +16,26 @@
 
     <div class="card" *ngFor="let item of getItemsByStatus(process.key)" cdkDrag (click)="openModal(item)">
       <div class="card-content">
-        <div>Vendor: {{ item.vendor }}</div>
-        <div>MPO Date: {{ item.mpoDate }}</div>
-        <div>MPO Amount: {{ item.mpoAmount }}</div>
-        <!-- <div>S: {{ item.status }}</div> -->
+        <!-- Card Type 1 -->
+        <div>
+          <div>Vendor: {{ item.vendor }}</div>
+          <div>MPO Date: {{ item.mpoDate }}</div>
+          <div>MPO Amount: {{ item.mpoAmount }}</div>
+        </div>
+        <div>
+          <!-- Card Type 2: Add more fields based on your needs -->
+          <div>Customer Code: {{ item.customerCode }}</div>
+          <div>First Name: {{ item.firstName }}</div>
+          <div>Last Name: {{ item.lastName }}</div>
+          <div>Logistic Route: {{ item.logisticRoute }}</div>
+          <div>Sales Route: {{ item.salesRoute }}</div>
+          <div>Sales Type: {{ item.salesType }}</div>
+          <div>SI Date: {{ item.siDate }}</div>
+          <div>SI Number: {{ item.siNumber }}</div>
+          <div>SO Date: {{ item.soDate }}</div>
+          <div>SO Number: {{ item.soNumber }}</div>
+          <div>Status: {{ item.status }}</div>
+        </div>
       </div>
     </div>
   </div>
