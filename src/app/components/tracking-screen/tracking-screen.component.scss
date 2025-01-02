@@ -155,3 +155,78 @@ h3 {
 }
 
 /* Application Label */
+/* General Styles for Header */
+.header-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+.app-label h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Custom Select Styling */
+.custom-select {
+  width: 100%;
+  max-width: 400px;  /* Limiting max width */
+  padding: 12px 16px;
+  font-size: 1rem;
+  color: #333;
+  background-color: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+
+  /* Add a subtle shadow */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus Effect for the Select */
+.custom-select:focus {
+  border-color: #4b6cb7;
+  background-color: #e1e9f2;
+  box-shadow: 0px 4px 15px rgba(75, 108, 183, 0.4); /* Blue focus shadow */
+}
+
+/* Drop-down animation */
+.custom-select option {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover Effect on Options */
+.custom-select option:hover {
+  background-color: #4b6cb7;
+  color: white;
+}
+
+/* Adding a subtle arrow to the select element */
+.custom-select::-ms-expand {
+  display: none;
+}
+
+.custom-select:after {
+  content: '▼';  /* Custom dropdown arrow */
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #333;
+  pointer-events: none;
+}
+
+/* Responsive Behavior */
+@media (max-width: 480px) {
+  .custom-select {
+    width: 90%;  /* Adjust width for smaller screens */
+  }
+}

@@ -1,15 +1,17 @@
 <div class="container">
   <div class="input-group">
+    <br>
     <button (click)="onLogout()" class="logout-btn">Log Out</button>
   </div>
   <div class="header-controls">
-    <label for="appName" class="app-label">Select Application:</label>
+    <label for="appName" class="app-label"><h2>Select Application:</h2></label><br>
     <select id="appName" class="custom-select" [(ngModel)]="selectedAppName" (change)="onAppNameChange(selectedAppName)">
       <option *ngFor="let app of assignedApplications" [value]="app">{{ app }}</option>
     </select>
-  </div>
+    <br>
+    <input type="text" class="search-bar" [(ngModel)]="searchTerm" placeholder="Search all fields..." />
+  </div>  
 </div>
-
 
 <div *ngIf="data?.length" class="tracking-container">
   <!-- Header Section -->      
@@ -22,27 +24,21 @@
     <h3>{{ process.processName }}</h3>
     <span>MPO Quantity: {{ getItemsByStatus(process.key).length }}</span>
 
-    <div class="card" *ngFor="let item of getItemsByStatus(process.key)" cdkDrag (click)="openModal(item)">
+    <div class="card" *ngFor="let item of getItemsByStatus(process.key) | filterData: searchTerm" cdkDrag (click)="openModal(item)">
       <div class="card-content">
-        <!-- Card Type 1 -->
-        <div>
+        <!-- Card Type 1: MPO -->
+        <div *ngIf="selectedAppName == 'MPO'">
           <div>Vendor: {{ item.vendor }}</div>
           <div>MPO Date: {{ item.mpoDate }}</div>
           <div>MPO Amount: {{ item.mpoAmount }}</div>
         </div>
-        <div>
-          <!-- Card Type 2: Add more fields based on your needs -->
-          <div>Customer Code: {{ item.customerCode }}</div>
-          <div>First Name: {{ item.firstName }}</div>
-          <div>Last Name: {{ item.lastName }}</div>
-          <div>Logistic Route: {{ item.logisticRoute }}</div>
-          <div>Sales Route: {{ item.salesRoute }}</div>
-          <div>Sales Type: {{ item.salesType }}</div>
-          <div>SI Date: {{ item.siDate }}</div>
+        
+        <!-- Card Type 2: IOCD -->
+        <div *ngIf="selectedAppName == 'IOCD'">
           <div>SI Number: {{ item.siNumber }}</div>
+          <div>SI Date: {{ item.siDate }}</div>
           <div>SO Date: {{ item.soDate }}</div>
           <div>SO Number: {{ item.soNumber }}</div>
-          <div>Status: {{ item.status }}</div>
         </div>
       </div>
     </div>

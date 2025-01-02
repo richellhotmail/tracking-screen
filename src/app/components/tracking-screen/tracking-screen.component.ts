@@ -22,6 +22,7 @@ export class TrackingScreenComponent implements OnInit {
   filteredHeader: any[] = [];  // Store filtered AppName-specific header
   selectedAppName: string = '';  // Default app selection
   assignedApplications: any[] = [];
+  searchTerm: string = ''; // This property holds the search term
 
   constructor(public dialog: MatDialog,
               private firestore: AngularFirestore,
@@ -31,7 +32,7 @@ export class TrackingScreenComponent implements OnInit {
   ngOnInit(): void {
     this.getProcesses();
     this.checkLogin();
-    this.batchDelete();
+    // this.batchDelete();
     // this.batchInsertProcesses();
     // this.batchInsert();
     // this.batchInsert2();
@@ -72,9 +73,7 @@ export class TrackingScreenComponent implements OnInit {
         this.filterHeaderByAppName(); // Initially filter by the default AppName
         console.log('Fetched Tracker Header:', response);
       });
-
- 
-  }
+    }
 
     filterHeaderByAppName() {
       // Filter processes by selected AppName
@@ -175,12 +174,12 @@ export class TrackingScreenComponent implements OnInit {
   }
   addBatchRecords() {
     const firestore = this.firestore.firestore;
-    const statuses = ['Pending', 'New', 'Successful'];
+    const statuses = ['q', 'w', 'e', 'r', 't', 'y', 'u']; // Updated statuses
     const salesTypes = ['retail', 'b2b', 'b2c'];
   
     const soDataCollection = firestore.collection('SO_Data');
   
-    // Pre-fetch all existing soNumbers
+    // Pre-fetch all existing soNumbers (if required, you can uncomment the related code)
     soDataCollection.get()
       .then(snapshot => {
         const batch = firestore.batch();
@@ -188,13 +187,8 @@ export class TrackingScreenComponent implements OnInit {
         for (let i = 0; i < 30; i++) {
           const soNumber = (Math.floor(Math.random() * 100000) + 1).toString();
   
-          // Skip if soNumber already exists
-          // if (existingSoNumbers.has(soNumber)) {
-          //   console.log(`Skipping duplicate soNumber: ${soNumber}`);
-          //   continue;
-          // }
-  
-          const id = uuidv4(); // Generate unique ID
+          // Generate unique ID
+          const id = uuidv4();
           const record = {
             customerCode: `CUST${i + 1}`,
             firstName: `FirstName${i + 1}`,
@@ -206,7 +200,7 @@ export class TrackingScreenComponent implements OnInit {
             siNumber: (Math.floor(Math.random() * 100000) + 1).toString(),
             soDate: new Date().toISOString(),
             soNumber, // Use the generated soNumber
-            status: statuses[Math.floor(Math.random() * statuses.length)],
+            status: statuses[Math.floor(Math.random() * statuses.length)], // Assign random status
           };
   
           const docRef = soDataCollection.doc(id);
@@ -222,7 +216,8 @@ export class TrackingScreenComponent implements OnInit {
       .catch(error => {
         console.error('Error during batch insertion:', error);
       });
-  }  
+  }
+  
 
   batchDelete() {
     const firestore = this.firestore.firestore; // Access Firestore SDK

@@ -61,7 +61,6 @@ export class LoginComponent implements OnInit {
   dismissError() {
     this.errorMessage = '';
   }
-  
 
   storeUserData(user: any) {
     sessionStorage.setItem('user', JSON.stringify(user));

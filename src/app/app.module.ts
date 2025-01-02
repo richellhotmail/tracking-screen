@@ -16,13 +16,15 @@ import { OrderByPipe } from './pipe/order-by.pipe';
 import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { RouterModule } from '@angular/router';
+import { FilterDataPipe } from './pipe/search-by.pipe';
 @NgModule({
   declarations: [
     AppComponent,
     TrackingScreenComponent,
     ModalContentComponent,
     OrderByPipe,
-    LoginComponent
+    LoginComponent,
+    FilterDataPipe
   ],
   imports: [
     MatDialogModule,
