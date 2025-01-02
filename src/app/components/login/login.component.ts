@@ -29,18 +29,19 @@ export class LoginComponent implements OnInit {
       this.errorMessage = 'Username and password are required';
       return;
     }
-
+  
     // Firestore query with AngularFire
     this.firestore
       .collection('Users', ref => ref.where('username', '==', this.username))
       .valueChanges()
       .subscribe({
         next: (response: any[]) => {
+          console.log('Login trying: ', response);
           if (response.length === 0) {
             this.errorMessage = 'Invalid username';
             return;
           }
-
+  
           const user = response[0];
           if (user.password === this.password) {
             console.log('Login successful');
@@ -56,6 +57,11 @@ export class LoginComponent implements OnInit {
         }
       });
   }
+  
+  dismissError() {
+    this.errorMessage = '';
+  }
+  
 
   storeUserData(user: any) {
     sessionStorage.setItem('user', JSON.stringify(user));
@@ -75,4 +81,29 @@ export class LoginComponent implements OnInit {
     sessionStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
+
+  // batchInsertProcesses() {
+  //   const processData = [
+  //     { appName: 'IOCD', processName: 'For SMS Confirmation', sequence: 1, key: 'q' },
+  //     { appName: 'IOCD', processName: 'For SO Approval', sequence: 2, key: 'w' },
+  //     { appName: 'IOCD', processName: 'SO Clustering', sequence: 3, key: 'e' },
+  //     { appName: 'IOCD', processName: 'Warehouse Issuance', sequence: 4, key: 'r' },
+  //     { appName: 'IOCD', processName: 'SI Printing', sequence: 5, key: 't' },
+  //     { appName: 'IOCD', processName: 'SI In-transit', sequence: 6, key: 'y' },
+  //     { appName: 'IOCD', processName: 'SI Confirmation of Acctg', sequence: 7, key: 'u' }
+  //   ];
+
+  //   // Loop through the data and add each item to Firestore
+  //   processData.forEach(item => {
+  //     const docRef = this.firestore.collection('AppProcesses').doc(); // Auto-generate document ID
+  //     docRef.set(item) // Insert the document with the data
+  //       .then(() => {
+  //         console.log(`Document added: ${item.processName}`);
+  //       })
+  //       .catch(error => {
+  //         console.error('Error adding document: ', error);
+  //       });
+  //   });
+  // }
+  
 }

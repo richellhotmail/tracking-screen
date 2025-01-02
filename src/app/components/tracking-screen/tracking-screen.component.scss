@@ -130,3 +130,28 @@ h3 {
   white-space: nowrap;  /* Prevents wrapping of the content */
   max-width: 100%;  /* Ensures content fits within the screen's width */
 }
+/* Log Out Button */
+.logout-btn {
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(90deg, #ff5722, #ff7043);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Header Controls */
+.header-controls {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Application Label */

@@ -7,7 +7,7 @@
         <input
           id="username"
           type="text"
-          [(ngModel)]="username" 
+          [(ngModel)]="username"
           name="username"
           required
         />
@@ -28,5 +28,11 @@
         <button type="submit" class="login-btn">Login</button>
       </div>
     </form>
+
+    <!-- Error Prompt -->
+    <div *ngIf="errorMessage" class="error-prompt">
+      <p>{{ errorMessage }}</p>
+      <button class="close-btn" (click)="dismissError()">OK</button>
+    </div>
   </div>
 </div>

@@ -1,11 +1,19 @@
-<div class="tracking-header">
-  <h2>MPO Process Overview</h2>
-  <p>Details about the processes are displayed below.</p>
+<div class="container">
+  <div class="input-group">
+    <button (click)="onLogout()" class="logout-btn">Log Out</button>
+  </div>
+  <div class="header-controls">
+    <label for="appName" class="app-label">Select Application:</label>
+    <select id="appName" class="custom-select" [(ngModel)]="selectedAppName" (change)="onAppNameChange(selectedAppName)">
+      <option *ngFor="let app of assignedApplications" [value]="app">{{ app }}</option>
+    </select>
+  </div>
 </div>
+
 
 <div *ngIf="data?.length" class="tracking-container">
   <!-- Header Section -->      
-  <div class="process-column" *ngFor="let process of trackerHeader | orderBy: 'sequence'" 
+  <div class="process-column" *ngFor="let process of filteredHeader | orderBy: 'sequence'" 
        cdkDropList
        [cdkDropListData]="getItemsByStatus(process.key)"
        [cdkDropListConnectedTo]="getConnectedList(process.sequence)"

@@ -5,6 +5,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { environment } from 'src/environments/environment';
 import { ModalContentComponent } from '../../modal-content/modal-content.component';
+import { v4 as uuidv4 } from 'uuid';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tracking-screen',
@@ -12,38 +14,98 @@ import { ModalContentComponent } from '../../modal-content/modal-content.compone
   styleUrls: ['./tracking-screen.component.scss']
 })
 export class TrackingScreenComponent implements OnInit {
+  private trackerHeaderSubscription: any;
+  private dataSubscription: any;
   username: string = ''; // Ensure this is declared properly
   trackerHeader: any[] = [];
   data: any[] = [];
+  filteredHeader: any[] = [];  // Store filtered AppName-specific header
+  selectedAppName: string = '';  // Default app selection
+  assignedApplications: any[] = [];
 
   constructor(public dialog: MatDialog,
               private firestore: AngularFirestore,
-              private afAuth: AngularFireAuth) {}
+              private afAuth: AngularFireAuth,
+              private router: Router ) {}
 
   ngOnInit(): void {
     this.getProcesses();
+    this.checkLogin();
+    this.batchDelete();
+    // this.batchInsertProcesses();
     // this.batchInsert();
     // this.batchInsert2();
-
   }
 
+  checkLogin() {
+    const user = sessionStorage.getItem('user');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      console.log('Logged in user:', parsedUser);
+      this.assignedApplications = parsedUser.applications;
+    } else {
+      console.log('No user logged in');
+    }
+  }
+
+  onLogout() {
+    sessionStorage.removeItem('user');
+    this.router.navigate(['/login']);
+    // this.addBatchRecords();
+  }
+
+  ngOnDestroy() {
+    if (this.trackerHeaderSubscription) {
+      this.trackerHeaderSubscription.unsubscribe();
+    }
+    if (this.dataSubscription) {
+      this.dataSubscription.unsubscribe();
+    }
+  }
+  
   getProcesses() {
     this.firestore
-      .collection('AppProcesses') // Replace with your document ID
+      .collection('AppProcesses')
       .valueChanges()
       .subscribe((response) => {
         this.trackerHeader = response;
+        this.filterHeaderByAppName(); // Initially filter by the default AppName
         console.log('Fetched Tracker Header:', response);
       });
 
-    this.firestore
-      .collection('MPO_Data') // Replace with your document ID
-      .valueChanges()
-      .subscribe((response) => {
-        this.data = response;
-        console.log('Fetched Data:', response);
-      });
+ 
   }
+
+    filterHeaderByAppName() {
+      // Filter processes by selected AppName
+      console.log("this.trackerHeader ", this.trackerHeader)
+      this.filteredHeader = this.trackerHeader.filter(item => item.AppName == this.selectedAppName || item.appName == this.selectedAppName);
+      console.log('Filtered Header:', this.filteredHeader);
+    }
+
+    // Handle the process status dropdown or other selection change
+    onAppNameChange(newAppName: string) {
+      this.selectedAppName = newAppName;
+      console.log('App Name:', this.selectedAppName);
+      this.filterHeaderByAppName();  // Re-filter when AppName changes
+      if (newAppName == 'MPO') {
+        this.firestore
+        .collection('MPO_Data')
+        .valueChanges()
+        .subscribe((response) => {
+          this.data = response;
+          console.log('Fetched Data:', response);
+        });
+      } else if (newAppName == 'IOCD') {
+        this.firestore
+        .collection('SO_Data')
+        .valueChanges()
+        .subscribe((response) => {
+          this.data = response;
+          console.log('Fetched Data:', response);
+        });
+      }
+    }
 
   getItemsByStatus(status: string) {
     return this.data.filter(item => item.status === status);
@@ -111,117 +173,151 @@ export class TrackingScreenComponent implements OnInit {
       data: item
     });
   }
+  addBatchRecords() {
+    const firestore = this.firestore.firestore;
+    const statuses = ['Pending', 'New', 'Successful'];
+    const salesTypes = ['retail', 'b2b', 'b2c'];
+  
+    const soDataCollection = firestore.collection('SO_Data');
+  
+    // Pre-fetch all existing soNumbers
+    soDataCollection.get()
+      .then(snapshot => {
+        const batch = firestore.batch();
+  
+        for (let i = 0; i < 30; i++) {
+          const soNumber = (Math.floor(Math.random() * 100000) + 1).toString();
+  
+          // Skip if soNumber already exists
+          // if (existingSoNumbers.has(soNumber)) {
+          //   console.log(`Skipping duplicate soNumber: ${soNumber}`);
+          //   continue;
+          // }
+  
+          const id = uuidv4(); // Generate unique ID
+          const record = {
+            customerCode: `CUST${i + 1}`,
+            firstName: `FirstName${i + 1}`,
+            lastName: `LastName${i + 1}`,
+            logisticRoute: `Route${i + 1}`,
+            salesRoute: `Sales Route ${i + 1}`,
+            salesType: salesTypes[Math.floor(Math.random() * salesTypes.length)],
+            siDate: new Date().toISOString(),
+            siNumber: (Math.floor(Math.random() * 100000) + 1).toString(),
+            soDate: new Date().toISOString(),
+            soNumber, // Use the generated soNumber
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+          };
+  
+          const docRef = soDataCollection.doc(id);
+          batch.set(docRef, record);
+        }
+  
+        // Commit the batch
+        return batch.commit();
+      })
+      .then(() => {
+        console.log('Batch insert completed successfully.');
+      })
+      .catch(error => {
+        console.error('Error during batch insertion:', error);
+      });
+  }  
 
-  batchInsert() {
-    interface SalesData {
-      customerCode: string;
-      firstName: string;
-      lastName: string;
-      logisticRoute: string;
-      salesRoute: string;
-      salesType: string;
-      siDate: string; // ISO string format
-      siNumber: string; // 6-digit number as string
-      soDate: string; // ISO string format
-      soNumber: string; // 6-digit number as string
-      status: string; // Restricted to provided values
-      id?: string; // Optional field for auto-generated ID
-    }
-  
-    const getRandomElement = (array: string[]): string => array[Math.floor(Math.random() * array.length)];
-    const getRandom6DigitNumber = (): string => Math.floor(100000 + Math.random() * 900000).toString();
-  
-    // Generate 30 random records
-    const jsonData: SalesData[] = Array.from({ length: 30 }, () => ({
-      customerCode: Math.random().toString(36).substring(2, 7).toUpperCase(), // Random 5-character alphanumeric string
-      firstName: getRandomElement(['John', 'Jane', 'Alice', 'Bob', 'Chris', 'Eve', 'Tom']),
-      lastName: getRandomElement(['Doe', 'Smith', 'Johnson', 'Brown', 'Davis', 'Garcia', 'Martinez']),
-      logisticRoute: getRandomElement(['NCR', 'Outside NCR']),
-      salesRoute: `Sales Route ${getRandomElement(['A', 'B', 'C', 'D'])}`,
-      salesType: getRandomElement(['b2b', 'b2c', 'c2c']),
-      siDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random date within the last 30 days
-      siNumber: getRandom6DigitNumber(),
-      soDate: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString(), // Random date within the last 60 days
-      soNumber: getRandom6DigitNumber(),
-      status: getRandomElement(['New', 'Success', 'In-transit', 'Pending']),
-    }));
-  
+  batchDelete() {
     const firestore = this.firestore.firestore; // Access Firestore SDK
-    const batchSize = 500; // Firestore supports batches of up to 500 writes
-    const collectionRef = firestore.collection('SO_Data'); // Target the Sales collection
-  
-    // Process data in batches
-    const batches = Array.from({ length: Math.ceil(jsonData.length / batchSize) }, (_, i) => {
-      const batch = firestore.batch();
-      jsonData.slice(i * batchSize, (i + 1) * batchSize).forEach(item => {
-        const docRef = collectionRef.doc(); // Generate a new document ID
-        item.id = docRef.id; // Set the auto-generated ID
-        batch.set(docRef, item); // Add the document to the batch
-      });
-      return batch;
-    });
-  
-    // Commit all batches
-    Promise.all(batches.map(batch => batch.commit()))
-      .then(() => console.log('Batch insert successful'))
-      .catch(error => console.error('Batch insert failed:', error));
-  }
-  
-  batchInsert2() {
+    const batchSize = 700; // Firestore supports batches of up to 500 writes
+    const collectionRef = firestore.collection('SO_Data'); // Target the Process collection
     
-    interface UserData {
-      applications: string[];
-      dateCreated: string; // ISO string format
-      groups: string[];
-      password: string;
-      username: string;
-      id?: string; // Optional id field
-    }
+    // Query to get all documents where appName is 'IOCD'
+    const query = collectionRef;
+    // Get the documents in batches
+    query.get().then(snapshot => {
+      const batches = Array.from({ length: Math.ceil(snapshot.size / batchSize) }, (_, i) => {
+        const batch = firestore.batch();
+        snapshot.docs.slice(i * batchSize, (i + 1) * batchSize).forEach(doc => {
+          batch.delete(doc.ref); // Mark the document for deletion
+        });
+        return batch;
+      });
   
-    const jsonData: UserData[] = [
-      {
-        applications: ['MPO', 'SO'],
-        dateCreated: '2024-12-12T00:00:00Z',
-        groups: ['G_MPO', 'G_SO'],
-        password: 'admin',
-        username: 'admin'
-      },
-      // Add more user data objects as required
-      {
-        applications: ['SO'],
-        dateCreated: '2024-12-23T00:00:00Z',
-        groups: ['G_SO'],
-        password: 'soworker',
-        username: 'soworker'
-      },
-      {
-        applications: ['MPO'],
-        dateCreated: '2024-12-19T00:00:00Z',
-        groups: ['G_MPO'],
-        password: 'mpoworker',
-        username: 'mpoworker'
-      }
-    ];
-  
+      // Commit each batch of deletions
+      batches.forEach(batch => batch.commit());
+    }).catch(error => {
+      console.error("Error deleting documents: ", error);
+    });
+  }
+  deleteDuplicates() {
     const firestore = this.firestore.firestore; // Access Firestore SDK
     const batchSize = 500; // Firestore supports batches of up to 500 writes
-    const collectionRef = firestore.collection('Users'); // Target the Users collection
+    const collectionRef = firestore.collection('SO_Data'); // Target the SO_Data collection
   
-    // Process data in batches
-    const batches = Array.from({ length: Math.ceil(jsonData.length / batchSize) }, (_, i) => {
-      const batch = firestore.batch();
-      jsonData.slice(i * batchSize, (i + 1) * batchSize).forEach(item => {
-        const docRef = collectionRef.doc(); // Generate a new document ID
-        item.id = docRef.id; // Set the auto-generated ID
-        batch.set(docRef, item); // Add the document to the batch
+    // Query to get all documents
+    collectionRef.get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          console.log("No documents found.");
+          return;
+        }
+  
+        // Group documents by duplicate criteria (excluding 'id')
+        const groupedDocs: { [key: string]: any[] } = {};
+        snapshot.docs.forEach(doc => {
+          const data:any = doc.data();
+  
+          // Create a unique key for each group based on all fields except 'id'
+          const groupKey = JSON.stringify({
+            customerCode: data.customerCode,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            logisticRoute: data.logisticRoute,
+            salesRoute: data.salesRoute,
+            salesType: data.salesType,
+            siDate: data.siDate,
+            siNumber: data.siNumber,
+            soDate: data.soDate,
+            soNumber: data.soNumber,
+            status: data.status,
+          });
+  
+          if (!groupedDocs[groupKey]) {
+            groupedDocs[groupKey] = [];
+          }
+          groupedDocs[groupKey].push({ ...data, ref: doc.ref });
+        });
+  
+        // Identify documents to delete
+        const docsToDelete: any[] = [];
+        Object.values(groupedDocs).forEach((docs: any[]) => {
+          if (docs.length > 1) {
+            // Sort documents by 'soDate' in descending order
+            docs.sort((a, b) => new Date(b.soDate).getTime() - new Date(a.soDate).getTime());
+            // Keep the first document (latest) and mark the rest for deletion
+            docsToDelete.push(...docs.slice(1).map(doc => doc.ref));
+          }
+        });
+  
+        // Delete documents in batches
+        const batches = Array.from(
+          { length: Math.ceil(docsToDelete.length / batchSize) },
+          (_, i) => {
+            const batch = firestore.batch();
+            docsToDelete.slice(i * batchSize, (i + 1) * batchSize).forEach(ref => {
+              batch.delete(ref);
+            });
+            return batch;
+          }
+        );
+  
+        // Commit each batch
+        return Promise.all(batches.map(batch => batch.commit()));
+      })
+      .then(() => {
+        console.log("Duplicate documents deleted successfully.");
+      })
+      .catch(error => {
+        console.error("Error deleting documents: ", error);
       });
-      return batch;
-    });
-  
-    // Commit all batches
-    Promise.all(batches.map(batch => batch.commit()))
-      .then(() => console.log('Batch insert successful'))
-      .catch(error => console.error('Batch insert failed:', error));
   }
   
 }
