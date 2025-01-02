@@ -4,7 +4,7 @@
     <button (click)="onLogout()" class="logout-btn">Log Out</button>
   </div>
   <div class="header-controls">
-    <label for="appName" class="app-label"><h2>Select Application:</h2></label><br>
+    <h2>Select Application</h2><br>
     <select id="appName" class="custom-select" [(ngModel)]="selectedAppName" (change)="onAppNameChange(selectedAppName)">
       <option *ngFor="let app of assignedApplications" [value]="app">{{ app }}</option>
     </select>
