@@ -106,6 +106,13 @@ export class TrackingScreenComponent implements OnInit {
       }
     }
 
+    getButtonColor(index: number): string {
+      const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF8C33', '#33FFF3'];
+      return colors[index % colors.length]; // Cycle through the colors array
+    }
+
+    
+
   getItemsByStatus(status: string) {
     return this.data.filter(item => item.status === status);
   }

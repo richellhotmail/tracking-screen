@@ -5,40 +5,54 @@
   </div>
   <div class="header-controls">
     <h2>Select Application</h2><br>
-    <select id="appName" class="custom-select" [(ngModel)]="selectedAppName" (change)="onAppNameChange(selectedAppName)">
-      <option *ngFor="let app of assignedApplications" [value]="app">{{ app }}</option>
-    </select>
+    <div class="button-group">
+      <button 
+        *ngFor="let app of assignedApplications; let i = index" 
+        class="app-button" 
+        [ngStyle]="{ 'background-color': getButtonColor(i) }" 
+        (click)="onAppNameChange(app)"
+      >
+        {{ app }}
+      </button>
+    </div>
     <br>
-    <input type="text" class="search-bar" [(ngModel)]="searchTerm" placeholder="Search all fields..." />
+    <input *ngIf="data?.length" type="text" class="search-bar" [(ngModel)]="searchTerm" placeholder="Search all fields..." />
   </div>  
 </div>
 
-<div *ngIf="data?.length" class="tracking-container">
-  <!-- Header Section -->      
-  <div class="process-column" *ngFor="let process of filteredHeader | orderBy: 'sequence'" 
-       cdkDropList
-       [cdkDropListData]="getItemsByStatus(process.key)"
-       [cdkDropListConnectedTo]="getConnectedList(process.sequence)"
-       [id]="'list-' + process.sequence"
-       (cdkDropListDropped)="onDrop($event, process)">
-    <h3>{{ process.processName }}</h3>
-    <span>MPO Quantity: {{ getItemsByStatus(process.key).length }}</span>
+<!-- Scrollable Header Section -->
+<div *ngIf="data?.length" class="tracking-container-wrapper">
+  <div class="tracking-container">
+    <div 
+      class="process-column" 
+      *ngFor="let process of filteredHeader | orderBy: 'sequence'" 
+      cdkDropList
+      [cdkDropListData]="getItemsByStatus(process.key)"
+      [cdkDropListConnectedTo]="getConnectedList(process.sequence)"
+      [id]="'list-' + process.sequence"
+      (cdkDropListDropped)="onDrop($event, process)">
+      <h3>{{ process.processName }}</h3>
+      <span>MPO Quantity: {{ getItemsByStatus(process.key).length }}</span>
 
-    <div class="card" *ngFor="let item of getItemsByStatus(process.key) | filterData: searchTerm" cdkDrag (click)="openModal(item)">
-      <div class="card-content">
-        <!-- Card Type 1: MPO -->
-        <div *ngIf="selectedAppName == 'MPO'">
-          <div>Vendor: {{ item.vendor }}</div>
-          <div>MPO Date: {{ item.mpoDate }}</div>
-          <div>MPO Amount: {{ item.mpoAmount }}</div>
-        </div>
-        
-        <!-- Card Type 2: IOCD -->
-        <div *ngIf="selectedAppName == 'IOCD'">
-          <div>SI Number: {{ item.siNumber }}</div>
-          <div>SI Date: {{ item.siDate }}</div>
-          <div>SO Date: {{ item.soDate }}</div>
-          <div>SO Number: {{ item.soNumber }}</div>
+      <div class="card" 
+           *ngFor="let item of getItemsByStatus(process.key) | filterData: searchTerm" 
+           cdkDrag 
+           (click)="openModal(item)">
+        <div class="card-content">
+          <!-- Card Type 1: MPO -->
+          <div *ngIf="selectedAppName == 'MPO'">
+            <div>Vendor: {{ item.vendor }}</div>
+            <div>MPO Date: {{ item.mpoDate }}</div>
+            <div>MPO Amount: {{ item.mpoAmount }}</div>
+          </div>
+          
+          <!-- Card Type 2: IOCD -->
+          <div *ngIf="selectedAppName == 'IOCD'">
+            <div>SI Number: {{ item.siNumber }}</div>
+            <div>SI Date: {{ item.siDate }}</div>
+            <div>SO Date: {{ item.soDate }}</div>
+            <div>SO Number: {{ item.soNumber }}</div>
+          </div>
         </div>
       </div>
     </div>
