@@ -12,12 +12,13 @@ export const environment: any = {
     messagingSenderId: "1013441824808",
     appId: "1:1013441824808:web:a5fca1468da90d32834d1d",
     measurementId: "G-5NTL01DNEK"
-  }
+  },
+  apiBaseUrl: 'http://localhost:3000',
 };
 
 
-/*
- * For easier debugging in development mode, you can import the following file
+/*ng 
+ * For easier debugging in development mode, you can import the following fnle
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *
  * This import should be commented out in production mode because it will have a negative impact

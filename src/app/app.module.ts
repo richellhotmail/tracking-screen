@@ -17,6 +17,8 @@ import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { RouterModule } from '@angular/router';
 import { FilterDataPipe } from './pipe/search-by.pipe';
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,7 +26,7 @@ import { FilterDataPipe } from './pipe/search-by.pipe';
     ModalContentComponent,
     OrderByPipe,
     LoginComponent,
-    FilterDataPipe
+    FilterDataPipe,
   ],
   imports: [
     MatDialogModule,
@@ -41,7 +43,8 @@ import { FilterDataPipe } from './pipe/search-by.pipe';
     RouterModule.forRoot([
       { path: '', component: LoginComponent },
       // Other routes
-    ])
+    ]),
+    HttpClientModule
   ],
   exports: [LoginComponent],
   providers: [],

@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { ModalContentComponent } from '../../modal-content/modal-content.component';
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from '@angular/router';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-tracking-screen',
@@ -27,7 +28,8 @@ export class TrackingScreenComponent implements OnInit {
   constructor(public dialog: MatDialog,
               private firestore: AngularFirestore,
               private afAuth: AngularFireAuth,
-              private router: Router ) {}
+              private router: Router,
+              private apiService: ApiService ) {}
 
   ngOnInit(): void {
     this.getProcesses();
@@ -96,13 +98,16 @@ export class TrackingScreenComponent implements OnInit {
           console.log('Fetched Data:', response);
         });
       } else if (newAppName == 'IOCD') {
-        this.firestore
-        .collection('SO_Data')
-        .valueChanges()
-        .subscribe((response) => {
+        // this.firestore
+        // .collection('SO_Data')
+        // .valueChanges()
+        // .subscribe((response) => {
+        //   this.data = response;
+        //   console.log('Fetched Data:', response);
+        // });
+        this.apiService.getSoData().subscribe(response => { console.log(response);
           this.data = response;
-          console.log('Fetched Data:', response);
-        });
+         });
       }
     }
 
@@ -114,7 +119,32 @@ export class TrackingScreenComponent implements OnInit {
     
 
   getItemsByStatus(status: string) {
-    return this.data.filter(item => item.status === status);
+      return this.data
+          .filter(item => item.STATUS.toLowerCase() == status.toLowerCase())
+          .sort((a, b) => new Date(a.SOTIME).getTime() - new Date(b.SOTIME).getTime());
+  }
+
+  getItemsVolumeByStatus(status: string) {
+    let data = this.data.filter(item => item.STATUS.toLowerCase() == status.toLowerCase());
+    let totalCases = data.reduce((sum, item) => sum + item.CASES, 0);
+    return totalCases;
+  }
+
+  getItemsValueByStatus(status: string) {
+    let data = this.data.filter(item => item.STATUS.toLowerCase() == status.toLowerCase());
+    let totalCases = data.reduce((sum, item) => sum + item.VALUE, 0);
+    return totalCases;
+  }
+
+  getItemsAgeByStatus(status: string) {
+    const currentDate = new Date();
+    let data = this.data.filter(item => item.STATUS.toLowerCase() == status.toLowerCase());
+    let ageInDays = data.reduce((sum, item) => sum + Math.floor((currentDate.getTime() - item.SOTIME)) / (1000 * 60 * 60 * 24)) ;
+    return ageInDays;
+  }
+
+  getItemsValByStatus(status: string) {
+    return this.data.filter(item => item.STATUS.toLowerCase() == status.toLowerCase());
   }
 
   getConnectedList(sequence: number): string[] {
@@ -136,7 +166,7 @@ export class TrackingScreenComponent implements OnInit {
       );
       // Update the status of the item being moved
       const movedItem = event.container.data[event.currentIndex];
-      movedItem.status = process.key; // Update item status to new process's key
+      movedItem.STATUS = process.key; // Update item status to new process's key
       this.updateItemStatus(movedItem); // Update the item status in Firestore or local data
     }
   }
@@ -179,51 +209,51 @@ export class TrackingScreenComponent implements OnInit {
       data: item
     });
   }
-  addBatchRecords() {
-    const firestore = this.firestore.firestore;
-    const statuses = ['q', 'w', 'e', 'r', 't', 'y', 'u']; // Updated statuses
-    const salesTypes = ['retail', 'b2b', 'b2c'];
+  // addBatchRecords() {
+  //   const firestore = this.firestore.firestore;
+  //   const statuses = ['q', 'w', 'e', 'r', 't', 'y', 'u']; // Updated statuses
+  //   const salesTypes = ['retail', 'b2b', 'b2c'];
   
-    const soDataCollection = firestore.collection('SO_Data');
+  //   const soDataCollection = firestore.collection('SO_Data');
   
-    // Pre-fetch all existing soNumbers (if required, you can uncomment the related code)
-    soDataCollection.get()
-      .then(snapshot => {
-        const batch = firestore.batch();
+  //   // Pre-fetch all existing soNumbers (if required, you can uncomment the related code)
+  //   soDataCollection.get()
+  //     .then(snapshot => {
+  //       const batch = firestore.batch();
   
-        for (let i = 0; i < 30; i++) {
-          const soNumber = (Math.floor(Math.random() * 100000) + 1).toString();
+  //       for (let i = 0; i < 30; i++) {
+  //         const soNumber = (Math.floor(Math.random() * 100000) + 1).toString();
   
-          // Generate unique ID
-          const id = uuidv4();
-          const record = {
-            customerCode: `CUST${i + 1}`,
-            firstName: `FirstName${i + 1}`,
-            lastName: `LastName${i + 1}`,
-            logisticRoute: `Route${i + 1}`,
-            salesRoute: `Sales Route ${i + 1}`,
-            salesType: salesTypes[Math.floor(Math.random() * salesTypes.length)],
-            siDate: new Date().toISOString(),
-            siNumber: (Math.floor(Math.random() * 100000) + 1).toString(),
-            soDate: new Date().toISOString(),
-            soNumber, // Use the generated soNumber
-            status: statuses[Math.floor(Math.random() * statuses.length)], // Assign random status
-          };
+  //         // Generate unique ID
+  //         const id = uuidv4();
+  //         const record = {
+  //           customerCode: `CUST${i + 1}`,
+  //           firstName: `FirstName${i + 1}`,
+  //           lastName: `LastName${i + 1}`,
+  //           logisticRoute: `Route${i + 1}`,
+  //           salesRoute: `Sales Route ${i + 1}`,
+  //           salesType: salesTypes[Math.floor(Math.random() * salesTypes.length)],
+  //           siDate: new Date().toISOString(),
+  //           siNumber: (Math.floor(Math.random() * 100000) + 1).toString(),
+  //           soDate: new Date().toISOString(),
+  //           soNumber, // Use the generated soNumber
+  //           status: statuses[Math.floor(Math.random() * statuses.length)], // Assign random status
+  //         };
   
-          const docRef = soDataCollection.doc(id);
-          batch.set(docRef, record);
-        }
+  //         const docRef = soDataCollection.doc(id);
+  //         batch.set(docRef, record);
+  //       }
   
-        // Commit the batch
-        return batch.commit();
-      })
-      .then(() => {
-        console.log('Batch insert completed successfully.');
-      })
-      .catch(error => {
-        console.error('Error during batch insertion:', error);
-      });
-  }
+  //       // Commit the batch
+  //       return batch.commit();
+  //     })
+  //     .then(() => {
+  //       console.log('Batch insert completed successfully.');
+  //     })
+  //     .catch(error => {
+  //       console.error('Error during batch insertion:', error);
+  //     });
+  // }
   
 
   batchDelete() {
