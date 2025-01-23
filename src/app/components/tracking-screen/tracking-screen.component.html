@@ -20,39 +20,37 @@
   </div>  
 </div>
 
-<!-- Scrollable Header Section -->
-<div *ngIf="data?.length" class="tracking-container-wrapper">
-  <div class="tracking-container">
-    <div 
-      class="process-column" 
-      *ngFor="let process of filteredHeader | orderBy: 'sequence'" 
-      cdkDropList
-      [cdkDropListData]="getItemsByStatus(process.key)"
-      [cdkDropListConnectedTo]="getConnectedList(process.sequence)"
-      [id]="'list-' + process.sequence"
-      (cdkDropListDropped)="onDrop($event, process)">
-      <h3>{{ process.processName }}</h3>
-      <span>MPO Quantity: {{ getItemsByStatus(process.key).length }}</span>
+<div *ngIf="data?.length" class="tracking-container">
+  <!-- Header Section -->      
+  <div class="process-column" *ngFor="let process of filteredHeader | orderBy: 'sequence'" 
+       cdkDropList
+       [cdkDropListData]="getItemsByStatus(process.key)"
+       [cdkDropListConnectedTo]="getConnectedList(process.sequence)"
+       [id]="'list-' + process.sequence"
+       (cdkDropListDropped)="onDrop($event, process)">
+    <h3>{{ process.processName }}</h3>
+    <span>TX {{ getItemsByStatus(process.key).length }}</span><br>
+    <span>{{ getItemsVolumeByStatus(process.key) | number: '1.0-0'}}</span>
+    <span> / {{ getItemsValueByStatus(process.key) | number: '1.0-0'}}</span>
+    <div class="card" *ngFor="let item of getItemsByStatus(process.key) | filterData: searchTerm" cdkDrag (click)="openModal(item)">
+      <div class="card-content">
+        <!-- Card Type 1: MPO -->
 
-      <div class="card" 
-           *ngFor="let item of getItemsByStatus(process.key) | filterData: searchTerm" 
-           cdkDrag 
-           (click)="openModal(item)">
-        <div class="card-content">
-          <!-- Card Type 1: MPO -->
-          <div *ngIf="selectedAppName == 'MPO'">
-            <div>Vendor: {{ item.vendor }}</div>
-            <div>MPO Date: {{ item.mpoDate }}</div>
-            <div>MPO Amount: {{ item.mpoAmount }}</div>
-          </div>
-          
-          <!-- Card Type 2: IOCD -->
-          <div *ngIf="selectedAppName == 'IOCD'">
-            <div>SI Number: {{ item.siNumber }}</div>
-            <div>SI Date: {{ item.siDate }}</div>
-            <div>SO Date: {{ item.soDate }}</div>
-            <div>SO Number: {{ item.soNumber }}</div>
-          </div>
+        <div *ngIf="selectedAppName == 'MPO'">
+          <div>Vendor: {{ item.vendor }}</div>
+          <div>MPO Date: {{ item.mpoDate }}</div>
+          <div>MPO Amount: {{ item.mpoAmount }}</div>
+        </div>
+        
+        <!-- Card Type 2: IOCD -->
+        <div *ngIf="selectedAppName == 'IOCD'">
+          <div>{{ item.SONUM }}</div>
+          <!-- <div>{{ item.SOTIME }}</div> -->
+          <!-- <div>{{ getItemsAgeByStatus(item.SOTIME) }}</div> -->
+          <div><strong>{{ item.CUSTNAME }}</strong></div>
+          <div>{{ item.CASES }} / {{ item.VALUE | number: '1.0-0' }}</div>
+          <div *ngIf="item.TRUCCODE">
+          {{ item.TRUCCODE}}</div>
         </div>
       </div>
     </div>
@@ -61,6 +59,6 @@
 
 <!-- Footer Section -->
 <div class="tracking-footer">
-  <p>&copy; 2024 MPO Tracking. All rights reserved.</p>
+  <p>&copy; 2025 Tracking Screen. All rights reserved.</p>
   <button>Footer Action</button>
 </div>
