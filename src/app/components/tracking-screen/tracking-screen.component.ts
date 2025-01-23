@@ -24,6 +24,7 @@ export class TrackingScreenComponent implements OnInit {
   selectedAppName: string = '';  // Default app selection
   assignedApplications: any[] = [];
   searchTerm: string = ''; // This property holds the search term
+  loading: boolean = false;
 
   constructor(public dialog: MatDialog,
               private firestore: AngularFirestore,
@@ -67,16 +68,24 @@ export class TrackingScreenComponent implements OnInit {
   }
   
   getProcesses() {
+    this.loading = true; // Start loading
     this.firestore
       .collection('AppProcesses')
       .valueChanges()
-      .subscribe((response) => {
-        this.trackerHeader = response;
-        this.filterHeaderByAppName(); // Initially filter by the default AppName
-        console.log('Fetched Tracker Header:', response);
-      });
-    }
-
+      .subscribe(
+        (response) => {
+          this.trackerHeader = response;
+          this.filterHeaderByAppName();
+          console.log('Fetched Tracker Header:', response);
+          this.loading = false; // Stop loading
+        },
+        (error) => {
+          console.error('Error fetching processes:', error);
+          this.loading = false; // Stop loading on error
+        }
+      );
+  }
+  
     filterHeaderByAppName() {
       // Filter processes by selected AppName
       console.log("this.trackerHeader ", this.trackerHeader)
@@ -105,8 +114,10 @@ export class TrackingScreenComponent implements OnInit {
         //   this.data = response;
         //   console.log('Fetched Data:', response);
         // });
+        this.loading = true;
         this.apiService.getSoData().subscribe(response => { console.log(response);
           this.data = response;
+          this.loading = false;
          });
       }
     }
